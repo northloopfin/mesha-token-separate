@@ -1,0 +1,25 @@
+{
+  "name": "@northloopfin/mesha-token-separate",
+  "version": "1.0.0",
+  "description": "These are the contracts for Mesha",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/northloopfin/mesha-token-separate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/northloopfin/mesha-token-separate/issues"
+  },
+  "homepage": "https://github.com/northloopfin/mesha-token-separate#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2"
+  }
+}
