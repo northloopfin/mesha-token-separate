@@ -12,7 +12,7 @@
 ## How To Set Up
 1. Clone the repository
 ```
-git clone https://github.com/northloopfin/mesha-token.git
+git clone https://github.com/northloopfin/mesha-token-separate.git
 ```
 2. Install dependencies for truffle
 ```
