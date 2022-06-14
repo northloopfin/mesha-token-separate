@@ -10,7 +10,7 @@ contract MeshaToken is Ownable, ERC20, TokenVesting {
     uint256 public constant TOKEN_SUPPLY = 10 * 10**9;
     uint256 public constant INITIAL_SUPPLY = 1 * 10**6;
     uint256 noOfTimesTokenIssued = 0;
-    uint256 createTime;
+    uint256 immutable createTime;
 
     constructor() ERC20("Mesha Token", "MESHA") 
                   TokenVesting(0x68ca398A19F1027f8f5eDe2C8275Da5A6C9194E7, 

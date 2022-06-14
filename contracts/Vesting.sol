@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Ownable.sol";
@@ -9,13 +9,13 @@ contract TokenVesting is Ownable {
     event Revoked();
 
     // beneficiary of tokens after they are released
-    address public beneficiary;
+    address public immutable beneficiary;
 
-    uint256 public cliff;
-    uint256 public start;
-    uint256 public duration;
+    uint256 public immutable cliff;
+    uint256 public immutable start;
+    uint256 public immutable duration;
 
-    bool public revocable;
+    bool public immutable revocable;
 
     mapping (address => uint256) public released;
     mapping (address => bool) public revoked;
@@ -30,8 +30,8 @@ contract TokenVesting is Ownable {
     * @param _revocable whether the vesting is revocable or not
     */
     constructor(address _beneficiary, uint256 _start, uint256 _cliff, uint256 _duration, bool _revocable) {
-        require(_beneficiary != address(0));
-        require(_cliff <= _duration);
+        require(_beneficiary != address(0), "Beneficiary cannot be zero address");
+        require(_cliff <= _duration, "Cliff cannot be longer than duration");
 
         beneficiary = _beneficiary;
         revocable = _revocable;
@@ -44,10 +44,10 @@ contract TokenVesting is Ownable {
     * @notice Transfers vested tokens to beneficiary.
     * @param token ERC20 token which is being vested
     */
-    function release(IERC20 token) public {
+    function release(IERC20 token) external {
         uint256 unreleased = releasableAmount(token);
 
-        require(unreleased > 0);
+        require(unreleased > 0, "No releasable amount");
 
         released[address(token)] += unreleased;
 
@@ -61,9 +61,9 @@ contract TokenVesting is Ownable {
     * remain in the contract, the rest are returned to the owner.
     * @param token ERC20 token which is being vested
     */
-    function revoke(IERC20 token) public onlyOwner {
-        require(revocable);
-        require(!revoked[address(token)]);
+    function revoke(IERC20 token) external onlyOwner {
+        require(revocable, "Is not revocable");
+        require(!revoked[address(token)], "Token has already been revoked");
 
         uint256 balance = token.balanceOf(address(this));
 
