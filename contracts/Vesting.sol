@@ -36,7 +36,7 @@ contract TokenVesting is Ownable {
         beneficiary = _beneficiary;
         revocable = _revocable;
         duration = _duration;
-        cliff = _start.add(_cliff);
+        cliff = _start += _cliff;
         start = _start;
     }
 
@@ -49,11 +49,11 @@ contract TokenVesting is Ownable {
 
         require(unreleased > 0);
 
-        released[token] = released[token].add(unreleased);
+        released[address(token)] += unreleased;
 
-        token.safeTransfer(beneficiary, unreleased);
+        token.transfer(beneficiary, unreleased);
 
-        Released(unreleased);
+        emit Released(unreleased);
     }
 
     /**
@@ -63,18 +63,18 @@ contract TokenVesting is Ownable {
     */
     function revoke(IERC20 token) public onlyOwner {
         require(revocable);
-        require(!revoked[token]);
+        require(!revoked[address(token)]);
 
-        uint256 balance = token.balanceOf(this);
+        uint256 balance = token.balanceOf(address(this));
 
         uint256 unreleased = releasableAmount(token);
-        uint256 refund = balance.sub(unreleased);
+        uint256 refund = balance - unreleased;
 
-        revoked[token] = true;
+        revoked[address(token)] = true;
 
-        token.safeTransfer(owner, refund);
+        token.transfer(owner(), refund);
 
-        Revoked();
+        emit Revoked();
     }
 
     /**
@@ -82,7 +82,7 @@ contract TokenVesting is Ownable {
     * @param token ERC20 token which is being vested
     */
     function releasableAmount(IERC20 token) public view returns (uint256) {
-        return vestedAmount(token).sub(released[token]);
+        return vestedAmount(token) - released[address(token)];
     }
 
     /**
@@ -90,15 +90,15 @@ contract TokenVesting is Ownable {
     * @param token ERC20 token which is being vested
     */
     function vestedAmount(IERC20 token) public view returns (uint256) {
-        uint256 currentBalance = token.balanceOf(this);
-        uint256 totalBalance = currentBalance.add(released[token]);
+        uint256 currentBalance = token.balanceOf(address(this));
+        uint256 totalBalance = currentBalance + released[address(token)];
 
-        if (now < cliff) {
+        if (block.timestamp < cliff) {
             return 0;
-        } else if (now >= start.add(duration) || revoked[token]) {
+        } else if (block.timestamp >= start + duration || revoked[address(token)]) {
             return totalBalance;
         } else {
-            return totalBalance.mul(now.sub(start)).div(duration);
+            return totalBalance * (block.timestamp - start) / duration;
         }
     }
 }
